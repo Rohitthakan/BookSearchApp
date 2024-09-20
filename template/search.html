@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% if messages %}
+    <div id="success-message-container">
+        {% for message in messages %}
+        <div class="alert alert-warning alert-dismissible fade show mb-0" role="alert">
+            <strong>{{ message }}</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    <script>
+        setTimeout(function() {
+            const container = document.getElementById('success-message-container');
+            if (container) {
+                container.style.display = 'none';
+            }
+        }, 4000);
+    </script>
+{% endif %}
+
+<div class="h-full overflow-y-auto" style="max-height: calc(100vh - 150px);">
+    <h1 class="text-2xl font-bold mb-4 mt-6">Search Books</h1>
+    <form method="GET" action="{% url 'search_books' %}" class="mb-4">
+        <input type="text" name="q" value="{{ query }}" placeholder="Search for books..." class="border p-2 w-full mb-4">
+        <button type="submit" class="bg-gray-700 text-white px-4 py-2 rounded">Search</button>
+    </form>
+
+    <div id="results" class="mt-4">
+        {% if books %}
+            {% for book in books %}
+            <div class="border p-4 mb-4">
+                <h2 class="font-bold">{{ book.title }}</h2>
+                <p><strong>Author:</strong> {{ book.author }}</p>
+                <p>{{ book.description }}</p>
+                
+                <form method="POST" action="{% url 'add_bookmark' %}" class="bookmark-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="title" value="{{ book.title }}">
+                    <input type="hidden" name="author" value="{{ book.author }}">
+                    <input type="hidden" name="description" value="{{ book.description }}">
+                    <input type="hidden" name="query" value="{{ query }}"> 
+                    <input type="hidden" name="page" value="{{ page }}">
+                    <button type="submit" class="bg-green-500 text-white px-4 py-2">Bookmark</button>
+                </form>
+                <div class="bookmark-message" style="display: none; color: green;"></div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p>No books found. Please try another search.</p>
+        {% endif %}
+    </div>
+
+    <div class="flex justify-center mt-4">
+        {% if previous_page %}
+        <a href="?q={{ query }}&page={{ previous_page }}" class="bg-gray-700 text-white px-4 py-2 rounded mr-2">Previous</a>
+        {% endif %}
+        {% if next_page %}
+        <a href="?q={{ query }}&page={{ next_page }}" class="bg-gray-700 text-white px-4 py-2 rounded">Next</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

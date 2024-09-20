@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Search App</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'style.css' %}"> 
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <header class="bg-gray-800 text-white py-4">
+        <h3 class="text-center text-2xl">BookNest</h3>
+    </header>
+
+    <div class="bg-gray-800 text-white p-4 flex justify-between md:hidden">
+        <h3 class="text-2xl">BookNest</h3>
+        <button id="menu-button" class="text-white focus:outline-none">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+            </svg>
+        </button>
+    </div>
+
+    <div class="flex flex-1">
+        <nav id="navbar" class="bg-gray-800 w-1/4 h-screen p-4 flex flex-col md:block hidden">
+            <ul class="space-y-4 text-white text-center flex-1 flex flex-col justify-center h-full">
+                <li><a href="{% url 'search_books' %}">Search Books</a></li>
+                <li><a href="{% url 'bookmarks' %}">Bookmarks</a></li>
+            </ul>
+        </nav>
+
+        <nav id="small-navbar" class="bg-gray-800 p-4 text-white flex-col items-center space-y-4 hidden md:hidden">
+            <ul class="w-full mt-4 text-center">
+                <li><a href="{% url 'search_books' %}" class="block py-2">Search Books</a></li>
+                <li><a href="{% url 'bookmarks' %}" class="block py-2">Bookmarks</a></li>
+            </ul>
+        </nav>
+
+        <div class="flex-1 p-6">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <footer class="bg-gray-800 text-white w-full text-center py-4 mt-auto">
+        <p>BookNest © 2024</p>
+    </footer>
+
+    <script>
+        const menuButton = document.getElementById('menu-button');
+        const navbar = document.getElementById('navbar');
+        const smallNavbar = document.getElementById('small-navbar');
+
+        menuButton.addEventListener('click', () => {
+            smallNavbar.classList.toggle('hidden');
+        });
+    </script>
+</body>
+</html>

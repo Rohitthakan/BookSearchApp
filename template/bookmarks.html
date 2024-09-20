@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="h-full overflow-y-auto mt-6" style="max-height: calc(100vh - 150px);">
+        <h2 class="text-3xl font-bold mb-6">Bookmarked Books</h2>
+        <div id="bookmarks" class="space-y-4">
+            {% if bookmarked_books %}
+                {% for bookmark in bookmarked_books %}
+                    <div class="p-4 bg-white rounded shadow mb-4 flex justify-between items-center">
+                        <div>
+                            <h3 class="text-lg font-bold">{{ bookmark.title }}</h3>
+                            <p class="text-gray-700">Author: {{ bookmark.author }}</p>
+                            <p class="text-gray-600">{{ bookmark.description }}</p>
+                        </div>
+                        <form method="post" action="{% url 'remove_bookmark' bookmark.id %}">
+                            {% csrf_token %}
+                            <button class="bg-red-500 text-white px-4 py-2 rounded" type="submit">Remove</button>
+                        </form>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-gray-500 text-center">No bookmarks found.</p>
+            {% endif %}
+        </div>
+        
+        <div id="pagination" class="flex justify-center mt-4">
+            {% if previous_page %}
+                <a href="?page={{ previous_page }}" class="bg-gray-700 text-white px-4 py-2 rounded mr-2">Prev</a>
+            {% endif %}
+            {% if next_page %}
+                <a href="?page={{ next_page }}" class="bg-gray-700 text-white px-4 py-2 rounded">Next</a>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
