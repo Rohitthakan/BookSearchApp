@@ -16,31 +16,46 @@ def search_books(request):
     except ValueError:
         page = 1
 
-    items_per_page = 3
+    items_per_page = 3  
     books = []
     previous_page = None
     next_page = None
+    total_books = 0
 
     if query:
-        url = f"https://www.googleapis.com/books/v1/volumes?q={query}"
-        response = requests.get(url)
-        data = response.json()
-        
-        if 'items' in data:
-            for item in data['items']:
-                book_info = item['volumeInfo']
-                books.append({
-                    'id': item['id'],  
-                    'title': book_info.get('title', 'N/A'),
-                    'author': ', '.join(book_info.get('authors', [])),
-                    'description': book_info.get('description', 'No description available')
-                })
-    
-    total_books = len(books)
-    if total_books > items_per_page:
+        if 'books_data' not in request.session or request.session.get('query') != query:
+
+            url = f"https://www.googleapis.com/books/v1/volumes?q={query}&maxResults=15"
+            print("API called") # Checking number of api calls
+
+            response = requests.get(url)
+            data = response.json()
+
+            if 'items' in data:
+                fetched_books = []
+                for item in data['items']:
+                    book_info = item['volumeInfo']
+                    fetched_books.append({
+                        'id': item['id'],
+                        'title': book_info.get('title', 'N/A'),
+                        'author': ', '.join(book_info.get('authors', [])),
+                        'description': book_info.get('description', 'No description available')
+                    })
+                
+                request.session['books_data'] = fetched_books
+                request.session['query'] = query
+                total_books = len(fetched_books)  
+                print(total_books)  # checking number of books
+            else:
+                request.session['books_data'] = []
+                total_books = 0
+        else:
+            fetched_books = request.session['books_data']
+            total_books = len(fetched_books)
+
         start_index = (page - 1) * items_per_page
         end_index = start_index + items_per_page
-        books = books[start_index:end_index]
+        books = fetched_books[start_index:end_index]
 
         if page > 1:
             previous_page = page - 1
@@ -53,6 +68,7 @@ def search_books(request):
         'previous_page': previous_page,
         'next_page': next_page
     })
+
 
 @login_required
 def bookmarks(request):
